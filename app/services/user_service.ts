@@ -48,6 +48,16 @@ export default class UserService {
 
   }
 
+  public static async getUser(auth: any) {
+
+    const user = await auth.authenticate()
+    if (!user) {
+      throw new Error('Unauthorized')
+    }
+
+    return user
+  }
+
 
 }
 

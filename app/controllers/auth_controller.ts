@@ -17,7 +17,7 @@ export default class AuthController {
       })
     } catch (error) {
       // Handle different types of errors differently (e.g., validation error, duplicate user error)
-      return response.status(400).json({ message: error.message })
+      return response.status(400).json({ error: error.message })
     }
   }
 
@@ -38,15 +38,23 @@ export default class AuthController {
 
       // If login is successful, send back the user details and token
       return response.status(200).json({
-        message: 'User logged in',
+        success: 'User logged in',
         user: result.user,
         token: result.token.value!.release()  // Release the token value for use
       })
 
     } catch (error) {
       // If there's an error (e.g., invalid credentials), return an unauthorized status
-      return response.status(401).json({ message: error.message })
+      return response.status(401).json({ error: error.message })
     }
+  }
+
+  async getUser({ auth, response }: HttpContext) {
+    const user = await UserService.getUser(auth)
+    return response.status(200).json({
+      message: 'Logged user fetched successfully',
+      user
+    })
   }
 
 }
