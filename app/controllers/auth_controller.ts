@@ -21,8 +21,7 @@ export default class AuthController {
     }
   }
 
-  async index({ request, response }: HttpContext) {
-
+  async index({ response }: HttpContext) {
     return response.status(200).json({
       message: 'hello World'
     })
@@ -31,19 +30,23 @@ export default class AuthController {
   async login({ request, response }: HttpContext) {
 
     try {
-
+      // Validate the user login input using loginUserValidator
       const payload = await loginUserValidator.validate(request.all())
+
+      // Attempt to log the user in with the validated payload
       const result = await UserService.login(payload)
 
+      // If login is successful, send back the user details and token
       return response.status(200).json({
         message: 'User logged in',
         user: result.user,
-        token: result.token.value!.release()
+        token: result.token.value!.release()  // Release the token value for use
       })
 
     } catch (error) {
+      // If there's an error (e.g., invalid credentials), return an unauthorized status
       return response.status(401).json({ message: error.message })
     }
-
   }
+
 }
