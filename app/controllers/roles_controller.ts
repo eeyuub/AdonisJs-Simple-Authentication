@@ -3,12 +3,16 @@
 import { CheckRoleAttributes } from '#validators/role_validation'
 import { HttpContext } from "@adonisjs/core/http"
 import RoleService from "#services/role_service"
+import { inject } from '@adonisjs/core'
 
+@inject()
 export default class RolesController {
+
+  constructor(protected roleService: RoleService) {}
 
 
   public async index({response}: HttpContext) {
-    const roles = await RoleService.findAll()
+    const roles = await this.roleService.findAll()
     return response.status(200).json(roles)
   }
 
@@ -17,7 +21,7 @@ export default class RolesController {
     try{
 
       const payload = await CheckRoleAttributes.validate(request.body())
-      const role = await RoleService.create(payload)
+      const role = await this.roleService.create(payload)
       return response.status(201).json({ success: 'Role created', role })
 
     }catch(error) {
@@ -31,7 +35,7 @@ export default class RolesController {
 
       const id = request.param('id')
       const payload = await CheckRoleAttributes.validate(request.all())
-      const role = await RoleService.update(id, payload)
+      const role = await this.roleService.update(id, payload)
       return response.status(200).json({ success: 'Role updated', role })
 
     }catch(error) {
@@ -43,7 +47,7 @@ export default class RolesController {
     try{
 
       const id = request.param('id')
-      const role = await RoleService.findById(id)
+      const role = await this.roleService.findById(id)
       return response.status(200).json(role)
 
     }catch(error) {
@@ -56,7 +60,7 @@ export default class RolesController {
     try{
 
       const roleParam = request.param('role')
-      const role = await RoleService.findByRole(roleParam)
+      const role = await this.roleService.findByRole(roleParam)
       return response.status(200).json(role)
 
     }catch(error) {
@@ -69,7 +73,7 @@ export default class RolesController {
     try{
 
       const role = request.param('role')
-      const users = await RoleService.getUsersByRoleName(role)
+      const users = await this.roleService.getUsersByRoleName(role)
       return response.status(200).json(users)
 
     }catch(error) {
@@ -81,7 +85,7 @@ export default class RolesController {
     try{
 
       const id = request.param('id')
-      await RoleService.delete(id)
+      await this.roleService.delete(id)
       return response.status(200).json({ success: 'Role deleted' })
 
     }catch(error) {

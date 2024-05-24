@@ -1,10 +1,12 @@
 import User from '#models/user'
+import { inject } from '@adonisjs/core'
 import hash from '@adonisjs/core/services/hash'
 
 /**
  * UserService class provides static methods for user authentication processes,
  * including login and registration functionalities.
  */
+@inject()
 export default class UserService {
 
   /**
@@ -13,14 +15,17 @@ export default class UserService {
    * @returns An object containing the user's token and user details if authentication is successful.
    * @throws Error if the user does not exist or if the password does not match.
    */
-  public static async login(payload: any) {
+   async login(payload: any) {
 
     const user = await User.findBy('email', payload.email)
     if (!user) {
       throw new Error('Invalid credentials')
     }
 
+    //console.log("Stored Hashed Password:", user.password); // Debugging output
+    //console.log("Provided Password:", payload.password); // Debugging output
     const passwordsMatch =  await hash.verify(user.password, payload.password)
+    //console.log("Passwords Match:", passwordsMatch); // Debugging output
     if (!passwordsMatch) {
       throw new Error('Password or email mismatch')
     }
@@ -35,7 +40,7 @@ export default class UserService {
    * @returns The newly created user object.
    * @throws Error if a user with the same email already exists.
    */
-  public static async register(payload: any) {
+   async register(payload: any) {
 
     const isExist = await User.findBy('email', payload.email)
 
@@ -48,7 +53,7 @@ export default class UserService {
 
   }
 
-  public static async getUser(auth: any) {
+   async getUser(auth: any) {
 
     const user = await auth.authenticate()
     if (!user) {
@@ -56,6 +61,58 @@ export default class UserService {
     }
 
     return user
+  }
+
+  async logout(auth: any) {
+    const user = await auth.authenticate()
+    if (!user) {
+      throw new Error('Unauthorized')
+    }
+    await User.accessTokens.delete(user, user.currentAccessToken?.identifier!)
+  }
+
+
+
+
+  async updateUser(id: number, updates: any) {
+    const user = await User.find(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    user.merge(updates);
+    await user.save();
+    return user;
+  }
+
+  async passwordReset(user: User, newPassword: string) {
+    user.password = newPassword
+    await user.save()
+    return user
+  }
+
+  async getUserByEmail(email: string) {
+    const user = await User.findBy('email', email)
+    if (!user) {
+      throw new Error('User not found')
+    }
+    return user
+  }
+
+  async getUserById(id: number) {
+    const user = await User.find(id)
+    if (!user) {
+      throw new Error('User not found')
+    }
+    return user
+  }
+
+  async deleteUser(id: number) {
+    const user = await User.find(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    await user.delete();
+
   }
 
 

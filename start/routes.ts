@@ -3,16 +3,26 @@ import { middleware } from '#start/kernel'
 
 
 router.group(() => {
-
-router.post('/register', '#controllers/auth_controller.register')
-router.post('/login', '#controllers/auth_controller.login')
+  router.post('/register', '#controllers/auth_controller.register')
+  router.post('/login', '#controllers/auth_controller.login')
 }).prefix('/api/v1/auth')
 
 
 router.group(() => {
+  router.post('/request-token', '#controllers/password_reset_tokens_controller.sendPasswordResetEmail')
+  router.post('/:token', '#controllers/password_reset_tokens_controller.resetPassword')
+}).prefix('/api/v1/password-reset')
+
+
+router.group(() => {
+  router.post('/logout', '#controllers/auth_controller.logout')
+}).prefix('/api/v1/auth').use(middleware.auth({guards: ['api']}))
+
+router.group(() => {
   router.get('/', '#controllers/auth_controller.index')
+
   router.get('/auth/user', '#controllers/auth_controller.getUser')
-}).prefix('/api/v1').use(middleware.auth())
+}).prefix('/api/v1').use(middleware.auth({guards: ['api']}))
 
 
 router.group(() => {
@@ -23,4 +33,4 @@ router.group(() => {
   router.post('/', '#controllers/roles_controller.create')
   router.put('/:id', '#controllers/roles_controller.update')
   router.get('/users/:role', '#controllers/roles_controller.getUsersByRoleName')
-}).prefix('/api/v1/roles').use(middleware.auth())
+}).prefix('/api/v1/roles').use(middleware.auth({guards: ['api']}))

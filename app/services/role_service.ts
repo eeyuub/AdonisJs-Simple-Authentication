@@ -1,10 +1,11 @@
+import { inject } from "@adonisjs/core"
 import Role from "../models/role.js"
-import User from "../models/user.js"
 
 
+@inject()
 export default class RoleService {
 
-  public static async findByRole(role: string) {
+   async findByRole(role: string) {
 
     const role_payload = await Role.findBy('role', role)
 
@@ -15,7 +16,7 @@ export default class RoleService {
     return role_payload
   }
 
-  public static async findById(id: number) {
+   async findById(id: number) {
     const role_payload = await Role.findBy('id', id)
 
     if(!role_payload) {
@@ -25,11 +26,11 @@ export default class RoleService {
     return role_payload
   }
 
-  public static async findAll() {
+   async findAll() {
     return await Role.all()
   }
 
-  public static async create(payload: any) {
+   async create(payload: any) {
 
     const isExist = await Role.findBy('role', payload.role)
 
@@ -45,7 +46,7 @@ export default class RoleService {
 
 }
 
-  public static async update(id: number, payload: any) {
+   async update(id: number, payload: any) {
 
     const role = await Role.findBy('id', id)
 
@@ -63,7 +64,7 @@ export default class RoleService {
 
   }
 
-  public static async delete(id: number) {
+   async delete(id: number) {
     const role = await Role.findBy('id', id)
 
     if(!role) {
@@ -73,7 +74,7 @@ export default class RoleService {
     return await role.delete()
   }
 
-  public static async getUsersByRoleName(role: string) {
+   async getUsersByRoleName(role: string) {
     const role_payload = await Role.query().where('role', role).preload('users')
 
     if (!role_payload) {
