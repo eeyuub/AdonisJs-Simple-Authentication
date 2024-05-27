@@ -8,7 +8,12 @@ import { inject } from '@adonisjs/core'
 @inject()
 export default class RolesController {
 
-  constructor(protected roleService: RoleService) {}
+
+
+  constructor(protected roleService: RoleService,
+    ) {
+
+    }
 
 
   public async index({response}: HttpContext) {
