@@ -3,18 +3,25 @@ import { createUserValidator, loginUserValidator } from '#validators/user_valida
 import  UserService  from '#services/user_service'
 import { inject } from '@adonisjs/core'
 import { AuthService } from '../services/auth_service.js'
+import User from '../models/user.js'
+import { CrudService } from '../services/crud_service.js'
 
 @inject()
 export default class AuthController {
 
 
-  constructor(protected userService: UserService, protected authService: AuthService)
+  protected crudService: CrudService
+
+  constructor(protected userService: UserService,
+     protected authService: AuthService
+     )
   {
+    this.crudService = new CrudService(User)
   }
 
   async register({ request, response }: HttpContext) {
     try {
-      const payload = await createUserValidator.validate(request.all())
+      const payload = await createUserValidator.validateAsync(request.all())
       const user = await this.authService.register(payload)
       // Assuming sensitive data is handled within the UserService
       return response.status(201).json({

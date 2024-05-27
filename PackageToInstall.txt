@@ -1,1 +1,2 @@
 npm i -D @adonisjs/eslint-plugin
+npm install joi

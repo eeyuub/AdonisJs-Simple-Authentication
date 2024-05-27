@@ -4,20 +4,23 @@ import { CheckRoleAttributes } from '#validators/role_validation'
 import { HttpContext } from "@adonisjs/core/http"
 import RoleService from "#services/role_service"
 import { inject } from '@adonisjs/core'
+import Role from '../models/role.js'
+import { CrudService } from '../services/crud_service.js'
 
 @inject()
 export default class RolesController {
 
-
+  private crudService: CrudService
 
   constructor(protected roleService: RoleService,
     ) {
-
+      this.crudService = new CrudService(Role);
     }
 
 
   public async index({response}: HttpContext) {
-    const roles = await this.roleService.findAll()
+    //const roles = await this.roleService.findAll()
+    const roles = await this.crudService.all()
     return response.status(200).json(roles)
   }
 
